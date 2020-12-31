@@ -7,31 +7,88 @@
 // Example: 5! = 5 x 4 x 3 x 2 x 1 = 120
 // factorial(5); // 120
 var factorial = function(n) {
+  if (n < 0) {
+    return null;
+    // need a return statement at the end of base case to give data back to recursion call to continue when it was pasued
+  } else if (n === 1 || n === 0) {
+    return 1;
+    // need a return statement at the end of base case to give data back to recursion call to continue when it was pasued
+  }
+  return n * factorial(n - 1);
 };
 
 // 2. Compute the sum of an array of integers.
 // sum([1,2,3,4,5,6]); // 21
 var sum = function(array) {
+  let result = 0;
+  if (!Array.isArray(array)) {
+    return array;
+    // need a return statement at the end of base case to give data back to recursion call to continue when it was pasued
+  }
+  array.forEach(function(item) {
+    result += sum(item);
+  });
+  return result;
 };
 
 // 3. Sum all numbers in an array containing nested arrays.
 // arraySum([1,[2,3],[[4]],5]); // 15
 var arraySum = function(array) {
+  let sum = 0;
+  if (!Array.isArray(array)) {
+    return array;
+  }
+  array.forEach(function(item) {
+    sum += arraySum(item);
+  });
+  return sum;
 };
 
 // 4. Check if a number is even.
 var isEven = function(n) {
+  let num = Math.abs(n);
+  if (num === 0) {
+    return true;
+  } else if (num === 1) {
+    return false;
+  }
+  return isEven(num - 2);
 };
+
 
 // 5. Sum all integers below a given integer.
 // sumBelow(10); // 45
 // sumBelow(7); // 21
 var sumBelow = function(n) {
+  if (n === 0 || n === 1 || n === -1) {
+    return 0;
+  } else if (n > 0) {
+    return n - 1 + sumBelow(n - 1);
+  } else if (n < 0) {
+    return n + 1 + sumBelow(n + 1);
+  }
 };
 
 // 6. Get the integers within a range (x, y).
 // range(2,9); // [3,4,5,6,7,8]
 var range = function(x, y) {
+  let arr = [];
+  if (y > x) {
+    if (y - x < 2) {
+      return arr;
+    }
+    arr.push(x + 1);
+    arr = arr.concat(range(x + 1, y));
+  } else if (y < x) {
+    if (x - y < 2) {
+      return arr;
+    }
+    arr.push(x - 1);
+    arr = arr.concat(range(x - 1, y));
+    // these 2 arr has different meanings
+    // arr (at the end of later recursion call) = arr(at the begining of later recursion call).concat(the result of this recursion call, sent back by previous lines of return)
+  }
+  return arr;
 };
 
 // 7. Compute the exponent of a number.
@@ -40,6 +97,12 @@ var range = function(x, y) {
 // exponent(4,3); // 64
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
+  if (exp === 0) {
+    return 1;
+  } else if (exp === 1) {
+    return base;
+  }
+  return base * exponent(base, exp - 1);
 };
 
 // 8. Determine if a number is a power of two.
@@ -47,14 +110,34 @@ var exponent = function(base, exp) {
 // powerOfTwo(16); // true
 // powerOfTwo(10); // false
 var powerOfTwo = function(n) {
+  if (n === 1 || n === 2) {
+    return true;
+  } else if (n < 2) {
+    return false;
+  }
+  return powerOfTwo(n / 2);
 };
 
 // 9. Write a function that reverses a string.
 var reverse = function(string) {
+  let reversedStr = '';
+  if (string.length === 0 || string.length === 1) {
+    return string;
+  }
+  reversedStr = string[string.length - 1] + reverse(string.slice(0, string.length - 1));
+  return reversedStr;
 };
 
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
+  if (string.length === 0 || string.length === 1) {
+    return true;
+  }
+  if (string.toLowerCase()[0] === string.toLowerCase()[string.length - 1]) {
+    return palindrome(string.slice(1, string.length - 1));
+  } else {
+    return false;
+  }
 };
 
 // 11. Write a function that returns the remainder of x divided by y without using the
@@ -63,6 +146,17 @@ var palindrome = function(string) {
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
+  if (x < 0 || x === 0 || x < y) {
+    return x;
+  } else if (x === 0 && y === 0) {
+    return NaN;
+  } else if (x - y === 0 && x !== 0) {
+    return 0;
+  } else if (x - y < y) {
+    return x - y;
+  } else {
+    return modulo(x - y, y);
+  }
 };
 
 // 12. Write a function that multiplies two numbers without using the * operator or
@@ -136,11 +230,43 @@ var countKeysInObj = function(obj, key) {
 // countValuesInObj(obj, 'r') // 2
 // countValuesInObj(obj, 'e') // 1
 var countValuesInObj = function(obj, value) {
+  let count = 0;
+  if (typeof Object.values(obj)[0] !== 'object') {
+    if (Object.values(obj)[0] === value) {
+      return count = count + 1;
+      // need a return statement at the end of base case to give data back to recursion call to continue when it was pasued
+    }
+  } else {
+    for (let key in obj) {
+      count = count + countValuesInObj(obj[key], value);
+    }
+  }
+  return count;
 };
 
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, oldKey, newKey) {
+  // define a function for key replacement
+  let replace = function (obj, oldKey, newKey) {
+    if (obj[oldKey] !== undefined) {
+      obj[newKey] = obj[oldKey];
+      delete obj[oldKey];
+    }
+  }
+  // base case for recursion
+  // without else will case stack overflow, trigger recursion whether if statement tests true or not
+  if (typeof Object.values(obj)[0] !== 'object') {
+    // call replacement function for base case
+    replace(obj, oldKey, newKey);
+  } else {
+    for (let key in obj) {
+      replaceKeysInObj(obj[key], oldKey, newKey);
+    }
+  }
+  // outter object is not changed yet, call again
+  replace(obj, oldKey, newKey);
+  return obj;
 };
 
 // 25. Get the first n Fibonacci numbers. In the Fibonacci sequence, each subsequent
